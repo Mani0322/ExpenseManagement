@@ -9,7 +9,8 @@ from expense_app.models.user import User
 
 from expense_app.schemas.user import UserCreate
 from expense_app.schemas.user import UserResponse
-from expense_app.utils.security import hash_password
+from expense_app.schemas.auth import LoginSchema
+from expense_app.utils.security import hash_password,verify_password
 
 
 
@@ -55,3 +56,37 @@ def register_user(
     db.refresh(user)
 
     return user
+
+
+@router.post("/login")
+def login_user(
+    payload : LoginSchema,
+    db: Session = Depends(get_db)
+
+):
+    user = db.query(User).filter(
+        User.email == payload.email
+    ).first()
+
+    if not user:
+        raise HTTPException(
+            status_code = 400,
+            detail = "invalid email or password"
+        )
+    is_valid_password = verify_password(
+        payload.password,
+        user.password
+    )
+
+    if not is_valid_password:
+        raise HTTPException(
+            status_code = 400,
+            detail = "invalid email or password"
+
+        )
+    
+    return {
+        "message":"login successfull",
+        "user_id":user.id,
+        "email":user.email
+    }
