@@ -3,6 +3,7 @@ from expense_app.database import Base, engine
 from expense_app.models.user import User
 from expense_app.models.category import Category
 from expense_app.models.expense import Expense
+from expense_app.routes.auth import router as auth_router
 
 # Create tables
 Base.metadata.create_all(bind=engine)
@@ -10,6 +11,8 @@ Base.metadata.create_all(bind=engine)
 app = FastAPI(
     title = "Expense Management API"
 )
+
+app.include_router(auth_router)
 
 @app.get("/")
 def home():
