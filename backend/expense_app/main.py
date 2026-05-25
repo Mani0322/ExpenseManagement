@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from expense_app.database import Base, engine
 from expense_app.models.user import User
 from expense_app.models.category import Category
@@ -10,6 +11,16 @@ Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
     title = "Expense Management API"
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins = [
+        "http://localhost:3000",
+    ],
+    allow_credentials=True,
+    allow_method = ["*"],
+    allow_headers = ["*"]
 )
 
 app.include_router(auth_router)
